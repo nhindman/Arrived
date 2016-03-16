@@ -1,6 +1,8 @@
-# meteor-boilerplate
+# Arrived
 
-A starting point for MeteorJS applications. Includes iron-router, Bootstrap 3, Font Awesome, LESS and more.
+Arrived lets you request an Uber via text and find the best places near your destination.
+Text (330)-595-1544 to get started.
+See a demo of Arrived at https://arrived.splashthat.com
 
 * [Included Packages](#included-packages)
 * [Installation](#installation)
