@@ -241,7 +241,7 @@ function handleUserLogin(userPhone, question){
   
   //ask user to login via short link
   //https://login.uber.com/oauth/authorize?client_id=yaMBSmNdB5Cb-JbEP11G_9s9COUN17l_&response_type=code&scope=profile+request&redirect_uri=https://arrived-nhindman.c9users.io/api/uber
-  sendSms(user, 'Sorry your ride request has expired, please make a new request. For example: "Ride from SFO to 56 Manchester Street San Francisco"');
+  sendSms(user, 'Please connect your Uber account with this link : https://goo.gl/jXO8KQ');
 }
 
 //TO DO: Breakup function
