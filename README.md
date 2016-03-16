@@ -1,136 +1,56 @@
 # Arrived
 
-Arrived lets you request an Uber via text and find the best places near your destination.
+Arrived lets you request an Uber and find the best places near your destination via SMS.
+
 Text (330)-595-1544 to get started.
+
 See a demo of Arrived at https://arrived.splashthat.com
 
-* [Included Packages](#included-packages)
-* [Installation](#installation)
-* [File Structure](#file-structure)
-* [Bootstrap and Less](#bootstrap-and-less)
-* [SEO](#seo)
-* [Favicons and Touch Icons](#favicons-and-touch-icons)
-* [Seed Data](#seed-data)
+Arrived is a Meteor application that utilizes the following APIs:
+* [Uber] (#uber)
+* [Twilio] (#twilio)
+* [Foursquare] (#foursquare)
 
-## <a name="included-packages"></a> Included Packages
+## <a name="uber"></a> Uber
+In order to access resources on behalf of an Uber user via the [Me](https://developer.uber.com/docs/v1-me) and [Requests](https://developer.uber.com/docs/v1-requests) endpoints, Arrived obtains an access_token from Uber in three steps:
 
-* Collections:
-  * [dburles:collection-helpers](https://github.com/dburles/meteor-collection-helpers)
-  * [matb33:collection-hooks](https://github.com/matb33/meteor-collection-hooks)
-  * [reywood:publish-composite](https://github.com/englue/meteor-publish-composite)
-* Router:
-  * [iron:router](https://github.com/EventedMind/iron-router)
-  * [zimme:iron-router-active](https://github.com/zimme/meteor-iron-router-active)
-  * [yasinuslu:blaze-meta](https://github.com/yasinuslu/blaze-meta)
-* Authentication
-  * [splendido:accounts-templates-bootstrap](https://github.com/splendido/accounts-templates-bootstrap)
-  * [alanning:roles](https://github.com/alanning/meteor-roles)
-* Seed Data
-  * [dburles:factory](https://github.com/percolatestudio/meteor-factory)
-  * [anti:fake](https://github.com/anticoders/meteor-fake/)
-* [Less](http://lesscss.org)
-  * [Bootstrap](http://getbootstrap.com)
-  * [Font Awesome](http://fontawesome.io)
-* Misc:
-  * [Moment.js](http://momentjs.com/)
-  * [Underscore.js](http://underscorejs.org/)
-  * [Underscore.string](http://epeli.github.io/underscore.string/)
-  * [cunneen:mailgun](https://github.com/cunneen/meteor-mailgun)
+1. [Authorize](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
+2. [Receive redirect](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
+3. [Get an access_token](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
-## <a name="installation"></a> Installation
+Using this access_token, Arrived is then authorized to:
 
-1. Clone this repo to `<yourapp>`
+* [Return user information about authorized Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
+* [Make Ride Requests on behalf of an Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
 
-  `git clone https://github.com/Differential/meteor-boilerplate.git <yourapp>`
-
-2. Remove `.git`
-
-  `cd <yourapp> && rm -rf .git`
-
-3. Start coding!
-
-## <a name="file-structure"></a> File Structure
-
-We have a common file structure we use across all of our Meteor apps. Client-only files are stored in the `client` directory, server-only files are stored in the `server` directory, and shared files are stored in the `both` directory. The `private` and `public` directories are for either private or public assets. 
-
-## <a name="bootstrap-and-less"></a> Bootstrap and LESS
-
-The majority of Bootstrap can be customized with LESS variables. If you look in `client/stylesheets/base/lib/bootstrap/variables.import.less` you will see a slew of configuration variables that can be tweaked to drastically change the look and feel of your site without having to write a single line of CSS.
-
-However we should avoid modifying the core Bootstrap Less files (in case we want to update them later), and should instead override the variables in our own LESS files.
-
-For example, to change the color of all primary buttons and links, simply add a `@brand-primary` variable to `stylesheets/base/variables.import.less`:
-
-```less
-// variables.import.less
-@brand-primary: #DC681D;
-```
-
-If you'd like to override a feature of Bootstrap that can't be modified using variables, simply create a new file in the `client/stylesheets/components` directory named after the corresponding Bootstrap component (eg. `buttons` in this case), and make your changes there.
-
-```less
-// buttons.import.less
-.btn {
-  text-transform: uppercase;
-}
-```
-
-After your file is ready, you need to import it into `client/stylesheets/base/global.less`. So, you would add in this statement:
-```less
-@import '@{components}/buttons.import.less';
-```
-
-The reason that this is done is to avoid any issues when the LESS files are compiled into CSS. That way, if one component relies on another or you want a certain order for your components, you can avoid any issues.
-
-## <a name="seo"></a> SEO
-
-Page titles, meta descriptions and Facebook and Twitter meta tags are handled by the [yasinuslu:blaze-meta](https://github.com/yasinuslu/blaze-meta) package. Global settings are configured in `both/router/meta.js`, while individual page settings are set at the controller level.
-
-* Note: the `spiderable` package will need to be installed and configured on your server in order for bots to read your meta tags.
+To track the status of a ride request and deliver timely texts to users, Arrived [specifies a webhook URL](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113) that receives POST requests from Uber about changes in the state of resources:
 
 ```javascript
-PostsShowController = AppController.extend({
-  path: '/posts/:_id',
-  waitOn: function() {
-    return this.subscribe('post', params._id);
-  },
-  data: function() {
-    return {
-      post: Post.find({_id: params._id})
-    };
-  },
-  onAfterAction: function() {
-    if(this.ready()) {
-      Meta.setTitle(this.data().post.title);
+.post(function(){
+    var webhookData = this.request.body;
+    
+    if (webhookData.event_type == 'requests.status_changed') {
+      if (this.request.body.meta.status == 'accepted') {
+        
+        //use request id returned from webhook and match it to a user based on the request id saved in my app
+        var user = uberUsers.findOne({'lastRequest.request_id':webhookData.meta.resource_id});
+        var requestInfo = Meteor.http.get(webhookData.resource_href,{
+          headers: { Authorization: 'Bearer ' + user.accessToken }
+        }).data;
+        
+        //send ride confirmation with requestInfo to user
+        if (!user.lastRequest.confirmation_sent) {
+          sendSms(user, ''+requestInfo.driver.name+' is on the way and will arrive in '+requestInfo.eta+'. Look out for a '+requestInfo.vehicle.make+' with the license plate '+requestInfo.vehicle.license_plate+'!');
+          Meteor.setTimeout(function(){
+            sendSms(user, 'Text "/nearby food" or "/nearby coffee" to see places near your destination');
+          },30000);
+          uberUsers.update(user._id, {$set:{'lastRequest.confirmation_sent':true}});
+        }
+      }
     }
-  }
-});
-```
-
-## <a name="favicons-and-touch-icons"></a> Favicons and Touch Icons
-
-Upload your image to http://realfavicongenerator.net/ and place the resulting images in `public/images/favicons`
-
-## Seed Data
-
-You can use the [dburles:factory](https://github.com/percolatestudio/meteor-factory) and [anti:fake](https://github.com/anticoders/meteor-fake/) packages to generate fake collection data for testing your UI. See `server/seeds.js` for an example:
-
-```javascript
-Meteor.startup(function() {
-
-  Factory.define('item', Items, {
-    name: function() { return Fake.sentence(); },
-    rating: function() { return _.random(1, 5); }
   });
-
-  if (Items.find({}).count() === 0) {
-
-    _(10).times(function(n) {
-      Factory.create('item');
-    });
-
-  }
-
-});
-
 ```
+
+## <a name="uber"></a> Twilio
+
+## <a name="uber"></a> Foursquare
