@@ -15,12 +15,12 @@ Arrived is a Meteor application that utilizes the following APIs:
 In order to access resources on behalf of an Uber user via the [Me](https://developer.uber.com/docs/v1-me) and [Requests](https://developer.uber.com/docs/v1-requests) endpoints, Arrived obtains an access_token from Uber in three steps:
 
 1. [Authorize](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
-2. [Receive redirect](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
+2. [Receive a redirect URI](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
 3. [Get an access_token](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
 Using this access_token, Arrived is then authorized to:
 
-* [Return user information about authorized Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
+* [Return user information about the authorized Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
 * [Make Ride Requests on behalf of an Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
 
 To track the status of a ride request and deliver timely texts to users, Arrived [specifies a webhook URL](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113) that receives POST requests from Uber about changes in the state of resources:
