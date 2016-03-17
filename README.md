@@ -2,8 +2,6 @@
 
 Arrived lets you request an Uber and find the best places near your destination via SMS.
 
-Text (330)-595-1544 to get started.
-
 See a demo of Arrived at https://arrived.splashthat.com
 
 Arrived is a Meteor application that utilizes the following APIs:
@@ -18,7 +16,7 @@ In order to access resources on behalf of an Uber user via the [Me](https://deve
 2. [Receive a redirect URI](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
 3. [Get an access_token](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
-Using this access_token, Arrived is then authorized to:
+Using the access_token, Arrived is then authorized to:
 
 * [Return user information about the authorized Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
 * [Make Ride Requests on behalf of an Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
@@ -52,5 +50,6 @@ To track the status of a ride request and deliver timely texts to users, Arrived
 ```
 
 ## <a name="uber"></a> Twilio
-
+TO DO 
 ## <a name="uber"></a> Foursquare
+TO DO
