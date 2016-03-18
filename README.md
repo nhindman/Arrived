@@ -7,11 +7,11 @@ See a demo of Arrived at https://arrived.splashthat.com
 The bulk of the code referenced below can found be found in [twilio.js](https://github.com/nhindman/Arrived/blob/master/server/twillo.js).
 
 Arrived is a Meteor application that uses the following APIs:
-* [Uber] (#uber)
-* [Twilio] (#twilio)
-* [Foursquare] (#foursquare)
+* Uber 
+* Twilio
+* Foursquare
 
-## <a name="uber"></a> Uber
+## Uber API
 In order to make ride requests on behalf of an Uber user, Arrived obtains an access token from the Uber API in three steps:
 
 1. Authorize
@@ -20,7 +20,7 @@ In order to make ride requests on behalf of an Uber user, Arrived obtains an acc
 
 **1. Authorize** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
 
-Arrived prompts a user to login via a URL that directs the user to a web form where they can approve or deny the app access to their Uber account. Parameters to append to such a login URL can be found [here](https://developer.uber.com/docs/authentication#section-step-one-authorize). 
+Arrived prompts a user to login via a URL that opens a web form where the user can approve or deny the app access to their Uber account. Parameters to append to such a login URL can be found [here](https://developer.uber.com/docs/authentication#section-step-one-authorize). 
 
 Here’s how the Arrived app’s login URL looks:
 
@@ -38,7 +38,7 @@ Router.route('/api/uber', { where: "server" } )
 
 **3. Get an access token** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
-Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which exchanges the authorization code for an access token:
+Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which fires a POST request to `https://login.uber.com/oauth/token` that exchanges the authorization code for an access token:
 
 ```javascript
 var getTokenResponse = function (query) {
@@ -94,8 +94,3 @@ In addition, Arrived tracks the status of a ride request in order to deliver tim
     }
   });
 ```
-
-## <a name="uber"></a> Twilio
-TO DO 
-## <a name="uber"></a> Foursquare
-TO DO
