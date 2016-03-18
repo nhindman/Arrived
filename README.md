@@ -12,24 +12,25 @@ Arrived is a Meteor application that uses the following APIs:
 * [Foursquare] (#foursquare)
 
 ## <a name="uber"></a> Uber
-In order to make ride requests on behalf of an Uber user, Arrived obtains an access_token from the Uber API in three steps:
+In order to make ride requests on behalf of an Uber user, Arrived obtains an access token from the Uber API in three steps:
 
-1. [Authorize](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
-2. [Receive a redirect URI](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
-3. [Get an access_token](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
+1. Authorize
+2. Receive a redirect URI
+3. Get an access_token
 
 **1. Authorize**
 
-When Arrived receives a text message from a user, it checks the Arrived app’s user database to see if a user with the same phone number has a valid access token, which would authorize Arrived to make ride requests on that user’s behalf.
-
-If Arrived does not find a valid access token, it prompts the user to enter the email associated with their Uber account (which Arrived saves to its user database for later use). Arrived then asks the user to login via a URL that directs to a web form where a user can approve or deny the app's access to their Uber account. A full list of query parameters to append to the login URL can be found [here](https://developer.uber.com/docs/authentication#section-step-one-authorize). 
+Arrived prompts a user to login via a URL that directs the user to a web form where they can approve or deny the app access to their Uber account. Parameters to append to such a login URL can be found [here](https://developer.uber.com/docs/authentication#section-step-one-authorize). 
 
 Here’s how the Arrived app’s login URL looks:
+
 `https://login.uber.com/oauth/authorize?client_id=ARRIVED_CLIENT_ID&response_type=code&scope=profile+request&redirect_uri=https://arrived-nhindman.c9users.io/api/uber`
+
+[Relevant code](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
 
 **2. Receive the redirect URI**
 
-After a user completes the web form - thereby authorizing the Arrived app - Uber sends a single-use authorization code to the redirect URI and Arrived receives the authorization code via the following route:
+After a user completes the web form - thereby authorizing the Arrived app - Uber sends a single-use authorization code to the redirect URI and Arrived receives the authorization code:
 ```javascript
 Router.route('/api/uber', { where: "server" } )
  .get( function() {
@@ -37,9 +38,11 @@ Router.route('/api/uber', { where: "server" } )
  ...
 ```
 
+[Relevant code](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
+
 **3. Get an access token**
 
-Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which exchanges the authorization code for an access token (full sample response [here](https://developer.uber.com/docs/authentication#section-step-three-get-an-access-token)):
+Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which exchanges the authorization code for an access token:
 
 ```javascript
 var getTokenResponse = function (query) {
@@ -63,6 +66,7 @@ var getTokenResponse = function (query) {
   }
 ...  
 ```
+[Relevant code](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
 Now that Arrived has an **access token**, the app can:
 * [Return user information about the authorized Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
