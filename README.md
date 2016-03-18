@@ -1,6 +1,6 @@
 # Arrived
 
-Arrived lets you request an Uber and find the best places near your destination via SMS.
+Request an Uber and find the best places near your destination via SMS.
 
 See a demo of Arrived at https://arrived.splashthat.com
 
