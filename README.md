@@ -18,7 +18,7 @@ In order to make ride requests on behalf of an Uber user, Arrived obtains an acc
 2. Receive a redirect URI
 3. Get an access_token
 
-**1. Authorize**
+**1. Authorize** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
 
 Arrived prompts a user to login via a URL that directs the user to a web form where they can approve or deny the app access to their Uber account. Parameters to append to such a login URL can be found [here](https://developer.uber.com/docs/authentication#section-step-one-authorize). 
 
@@ -26,9 +26,7 @@ Here’s how the Arrived app’s login URL looks:
 
 `https://login.uber.com/oauth/authorize?client_id=ARRIVED_CLIENT_ID&response_type=code&scope=profile+request&redirect_uri=https://arrived-nhindman.c9users.io/api/uber`
 
-[Relevant code](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L235)
-
-**2. Receive the redirect URI**
+**2. Receive the redirect URI** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
 
 After a user completes the web form - thereby authorizing the Arrived app - Uber sends a single-use authorization code to the redirect URI and Arrived receives the authorization code:
 ```javascript
@@ -38,9 +36,7 @@ Router.route('/api/uber', { where: "server" } )
  ...
 ```
 
-[Relevant code](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
-
-**3. Get an access token**
+**3. Get an access token** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
 Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which exchanges the authorization code for an access token:
 
@@ -66,13 +62,12 @@ var getTokenResponse = function (query) {
   }
 ...  
 ```
-[Relevant code](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
 Now that Arrived has an **access token**, the app can:
-* [Return user information about the authorized Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
-* [Make Ride Requests on behalf of an Uber user](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
+* Return user information about the authorized Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
+* Make Ride Requests on behalf of an Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
 
-In addition, Arrived tracks the status of a ride request in order to deliver timely texts to users. To do so, Arrived [specifies a webhook URL](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113) that receives POST requests from Uber about changes in the status of a ride:
+In addition, Arrived tracks the status of a ride request in order to deliver timely texts to users. To do so, Arrived specifies a webhook URL that receives POST requests from Uber about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113):
 
 ```javascript
 .post(function(){
