@@ -12,7 +12,7 @@ Arrived is a Meteor application that uses the following APIs:
 * Foursquare
 
 ## Uber API
-In order to make ride requests on behalf of an Uber user, Arrived obtains an access token from the Uber API in three steps:
+In order to make Ride Requests on behalf of an Uber user, Arrived obtains an access token from the Uber API in three steps:
 
 1. Authorize
 2. Receive a redirect URI
@@ -67,7 +67,7 @@ Now that Arrived has an **access token**, the app can:
 * Return user information about the authorized Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
 * Make Ride Requests on behalf of an Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
 
-In addition, Arrived tracks the status of a ride request in order to deliver timely texts to users. To do so, Arrived specifies a webhook URL that receives POST requests from Uber about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113):
+In addition, Arrived tracks the status of a Ride Request in order to deliver timely texts to users. To do so, Arrived specifies a webhook URL that receives POST requests from Uber about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113):
 
 ```javascript
 .post(function(){
