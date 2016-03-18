@@ -12,7 +12,7 @@ Arrived is a Meteor application that uses the following APIs:
 * Foursquare
 
 ## Uber API
-In order to make Ride Requests on behalf of an Uber user, Arrived obtains an access token from the Uber API in three steps:
+In order to make Ride Requests on behalf of an Uber user, Arrived obtains an access token [(more info)](https://developer.uber.com/docs/authentication) from the Uber API in three steps:
 
 1. Authorize
 2. Receive a redirect URI
@@ -67,7 +67,9 @@ Now that Arrived has an **access token**, the app can:
 * Return user information about the authorized Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
 * Make Ride Requests on behalf of an Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
 
-In addition, Arrived tracks the status of a Ride Request in order to deliver timely texts to users. To do so, Arrived specifies a webhook URL that receives POST requests from Uber about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113):
+In addition, Arrived tracks the status of a Ride Request in order to deliver timely texts to users. To do so, Arrived specifies a **webhook URL** [(more info)](https://developer.uber.com/docs/webhooks) that receives POST requests from Uber about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113).
+
+Among the parameters received in the webhook POST request is the `resource_id`, a unique identifier of the Request which has had a status change. Arrived uses the `resource_id` to match a Ride Request to a user and sends that user a ride confirmation message:  
 
 ```javascript
 .post(function(){
