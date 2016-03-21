@@ -22,13 +22,14 @@ In order to make Ride Requests on behalf of an Uber user, Arrived obtains an acc
 
 Arrived prompts a user to login via a URL that opens a web form where the user can approve or deny the app access to their Uber account. Parameters to append to such a login URL can be found [here](https://developer.uber.com/docs/authentication#section-step-one-authorize). 
 
-Here’s how the Arrived app’s login URL looks:
+Here’s the Arrived app’s login URL:
 
 `https://login.uber.com/oauth/authorize?client_id=ARRIVED_CLIENT_ID&response_type=code&scope=profile+request&redirect_uri=https://arrived-nhindman.c9users.io/api/uber`
 
 **2. Receive the redirect URI** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L89)
 
-After a user completes the web form - thereby authorizing the Arrived app - Uber sends a single-use authorization code to the redirect URI and Arrived receives the authorization code:
+After a user completes the web form - thereby authorizing the Arrived app - the Uber API sends a single-use authorization code to the redirect URI and Arrived receives the authorization code:
+
 ```javascript
 Router.route('/api/uber', { where: "server" } )
  .get( function() {
@@ -38,7 +39,7 @@ Router.route('/api/uber', { where: "server" } )
 
 **3. Get an access token** [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L26)
 
-Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which fires a POST request to `https://login.uber.com/oauth/token` that exchanges the authorization code for an access token:
+Arrived then passes the authorization code received in step 2 into the function `getTokenResponse` which fires a POST request to `https://login.uber.com/oauth/token` exchanging the authorization code for an access token:
 
 ```javascript
 var getTokenResponse = function (query) {
@@ -67,9 +68,9 @@ Now that Arrived has an **access token**, the app can:
 * Return user information about the authorized Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L63)
 * Make Ride Requests on behalf of an Uber user [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L220)
 
-In addition, Arrived tracks the status of a Ride Request in order to deliver timely texts to users. To do so, Arrived specifies a **webhook URL** [(more info)](https://developer.uber.com/docs/webhooks) that receives POST requests from Uber about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113).
+In addition, Arrived tracks the status of a Ride Request in order to deliver timely texts to users. To do so, Arrived specifies a **webhook URL** [(more info)](https://developer.uber.com/docs/webhooks) that receives POST requests from the Uber API about changes in the status of a ride [(code)](https://github.com/nhindman/Arrived/blob/master/server/twillo.js#L113).
 
-Among the parameters received in the webhook POST request is the `resource_id`, a unique identifier of the Request which has had a status change. Arrived uses the `resource_id` to match a Ride Request to a user and sends that user a ride confirmation message:  
+Among the parameters received in the webhook POST request is the `resource_id`, a unique identifier of the Ride Request. Arrived uses the `resource_id` to match the Ride Request to a user in its database and sends that user a confirmation message:  
 
 ```javascript
 .post(function(){
